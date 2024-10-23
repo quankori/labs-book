@@ -1,0 +1,7 @@
+go 1.22.6
+
+use (
+	./src/cmd/email
+	./src/cmd/users
+	./src/pkg
+)

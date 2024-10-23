@@ -1,0 +1,42 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "prj-api-ecs-dev",
+      "image": "498907343309.dkr.ecr.ap-southeast-1.amazonaws.com/prj-ecr-dev:latest",
+      "cpu": 256,
+      "memory": 512,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "secrets": [
+        {
+          "name": "NODE_ENV",
+          "valueFrom": "arn:aws:ssm:ap-southeast-1:498907343309:parameter/NODE_ENV"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "prj-api-ecs-logs-dev",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "ecs_api"
+        }
+      }
+    }
+  ],
+  "family": "prj-api-ecs-task-def-dev",
+  "taskRoleArn": "arn:aws:iam::498907343309:role/prj-api-ecs-role-task-dev",
+  "executionRoleArn": "arn:aws:iam::498907343309:role/prj-api-ecs-role-exec-dev",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512"
+}

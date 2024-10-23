@@ -1,0 +1,26 @@
+version: 0.2
+
+env:
+  variables:
+    ENV: "dev"
+    SRC_LAND: "web"
+
+phases:
+  pre_build:
+    commands:
+      - ls -la ${CODEBUILD_SRC_DIR}/${SRC_LAND}/
+      - echo "S3 LANDING PAGE ${S3_FRONT}"
+      - echo "Build to ${ENV}"
+      - echo "Build to ${AWS_REGION}"
+      - echo "Build to ${ECR_URI}"
+      - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 498907343309.dkr.ecr.ap-southeast-1.amazonaws.com
+
+  build:
+    commands:
+      - chmod a+x ${CODEBUILD_SRC_DIR}/codebuild/web/build.sh
+      - ${CODEBUILD_SRC_DIR}/codebuild/web/build.sh
+
+  post_build:
+    commands:
+      - chmod a+x ${CODEBUILD_SRC_DIR}/codebuild/web/postbuild.sh
+      - ${CODEBUILD_SRC_DIR}/codebuild/web/postbuild.sh
