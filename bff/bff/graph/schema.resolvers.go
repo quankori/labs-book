@@ -8,10 +8,27 @@ import (
 	"bff/graph/model"
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 
 	"math/rand"
+
+	pb "bff/user"
+
+	"google.golang.org/grpc"
 )
+
+var conn *grpc.ClientConn
+var client pb.UserServiceClient
+
+func init() {
+	var err error
+	conn, err = grpc.Dial("localhost:50051", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	client = pb.NewUserServiceClient(conn)
+}
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, text string) (*model.Todo, error) {
@@ -23,6 +40,12 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, text string) (*model.
 
 	r.mu.Lock()
 	r.todos = append(r.todos, todo)
+	req := &pb.CreateUserRequest{Username: "Quan", Email: "minhquan@gmail.com"}
+	resp, err := client.CreateUser(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("error creating user: %v", err)
+	}
+	fmt.Println(resp)
 	for _, sub := range r.subscribers {
 		sub <- todo
 	}
@@ -47,6 +70,12 @@ func (r *mutationResolver) ToggleTodoStatus(ctx context.Context, id string) (*mo
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+	req := &pb.GetUserRequest{UserId: "1"}
+	resp, err := client.GetUser(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("error getting user: %v", err)
+	}
+	fmt.Println(resp)
 	return r.todos, nil
 }
 
